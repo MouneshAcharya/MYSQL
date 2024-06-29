@@ -1,0 +1,590 @@
+CREATING DATABASE
+-----------------
+while creating the database, It is better to set the character set and collation
+
+character set
+character set is to store the data in multiple languages 
+better options is utf-8
+
+collation
+it defines the rules for data sorting and comparision
+better options are utf8mb4_general_ci or utf8mb4_unicode_ci
+
+USE
+===
+USE database_name;
+
+DROP DATABASE
+=============
+DROP DATABASE database_name;
+
+
+CREATING TABLE
+--------------
+CREATE TABLE table_name (
+    column1 datatype [optional_parameters],
+    column2 datatype [optional_parameters],
+    ...
+    PRIMARY KEY (one or more columns)
+);
+
+column data types:
+numberic types
+INT - for smaller range whole number
+BIGINT - for larger range whole number
+FLOAT - for smaller range precesion value
+DOUBLE - for larger range precesion value
+
+String types
+VARCHAR(size) 
+if a column is defined as VARCHAR(10), allowing it to store strings of variable length up to a maximum of 10 characters. 
+No padding with spaces occurs, and the actual length of the stored string is used.
+
+CHAR(size)
+if a column is defined as CHAR(10), meaning it will always store strings of exactly 10 characters.
+If a string is shorter than 10 characters, it will be padded with spaces.
+
+Date and time types
+DATE - to store date value
+TIME - to store time value
+DATETIME - to store both date and time value
+TIMESTAMP - to store date time with seconds,milli seconds information
+
+Boolean types
+BOOLEAN - to store boolean values
+
+binary large objects
+BLOB - Use BLOB when dealing with binary data, such as images or documents.
+TEXT - Use TEXT when handling large amounts of textual data, such as long paragraphs or documents.
+
+column constraints
+NOT NULL - to add not null condition to column value
+DEFAULT - to set the default value
+AUTO_INCREMENT - to set the auto increment to column
+UNIQUE - to store unique value across rows in the table
+PRIMARY KEY - to define the one or more columns for primary key
+
+table constraints
+PRIMARY KEY (column 1,column 2, ...)- primary constraints for one or more columns
+FOREIGN KEY (column 1) REFERENCES table_name (referenced_column)
+
+Indexes 
+INDEX index_name(column1, column2) - create index for one or more columns 
+UNIQUE INDEX index_name(column1, column2) - creates unique index
+
+Storage engine
+ENGINE=InnoDB - specifies the storage engine for table
+
+example 
+create table customer(
+id int primary key,
+firstname varchar(120) not null,
+lastname varchar(120),
+email varchar(50),
+phno int
+);
+
+create table orders(
+id int primary key,
+cust_id int not null,
+product_name varchar(120) not null,
+product_id int not null,
+product_qty int not null,
+foreign key(cust_id) references customer(id)
+);
+
+alter table commands
+====================
+- add column
+
+ALTER TABLE table_name
+ADD COLUMN new_column_name data_type;
+
+
+- modify column
+
+ALTER TABLE table_name
+MODIFY COLUMN existing_column_name new_data_type;
+
+
+- rename column
+
+ALTER TABLE table_name
+RENAME COLUMN old_column_name TO new_column_name;
+
+
+- drop column
+
+ALTER TABLE table_name
+DROP COLUMN column_to_be_dropped;
+
+
+- add primay key
+
+ALTER TABLE table_name
+ADD PRIMARY KEY (column1, column2, ...);
+
+
+- add foreign key
+
+ALTER TABLE child_table
+ADD FOREIGN KEY (foreign_key_column)
+REFERENCES parent_table (primary_key_column);
+
+
+- drop constraint
+
+ALTER TABLE table_name
+DROP FOREIGN KEY constraint_name;
+
+delete and truncate commands
+============================
+Use DELETE when you need to selectively delete specific rows based on a condition.
+Use TRUNCATE when you want to remove all rows from a table.TRUNCATE is generally faster but cannot be rolled back.
+
+DELETE FROM table_name WHERE condition;
+TRUNCATE TABLE table_name;
+
+describe table structure
+========================
+DESCRIBE table_name;
+
+update table
+============
+UPDATE table_name SET column1 = value1, column2 = value2 WHERE condition;
+
+insert into
+===========
+INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...);
+
+select 
+======
+SELECT column1, column2 FROM table_name WHERE condition;
+
+create index
+============
+CREATE INDEX index_name ON table_name (column1, column2, ...);
+
+drop index 
+==========
+DROP INDEX index_name ON table_name;
+
+SHOW
+====
+show databases;
+show tables;
+
+PROCEDURE
+=========
+it is a set of sql statements stored in database and executed later
+easy to manage and reuse the code
+
+creating procedure
+------------------
+DELIMITER //
+CREATE PROCEDURE procedure_name (IN param1 INT, IN param2 VARCHAR(255))
+BEGIN
+    -- SQL statements for the procedure
+    SELECT * FROM your_table WHERE column1 = param1 AND column2 = param2;
+END //
+DELIMITER ;
+
+
+calling procedure
+-----------------
+CALL procedure_name(value1, 'value2');
+
+viewing procedure status
+------------------------
+SHOW PROCEDURE STATUS;
+
+dropping procedure
+------------------
+DROP PROCEDURE IF EXISTS procedure_name;
+
+TRIGGER
+=======
+trigger is a set of instructions that are automatically executed in response to a specific event on a particular table or view.
+
+creating trigger
+----------------
+DELIMITER //
+
+CREATE TRIGGER trigger_name
+BEFORE/AFTER INSERT/UPDATE/DELETE
+ON table_name
+FOR EACH ROW
+BEGIN
+    -- Trigger body (SQL statements)
+END //
+
+DELIMITER ;
+
+example 
+-------
+DELIMITER //
+
+CREATE TRIGGER update_last_modified
+BEFORE UPDATE
+ON employees
+FOR EACH ROW
+BEGIN
+    SET NEW.last_modified = NOW();
+END //
+
+DELIMITER ;
+
+dropping a trigger
+------------------
+DROP TRIGGER IF EXISTS trigger_name;
+
+viewing trigger
+---------------
+SHOW TRIGGERS;
+
+using trigger
+-------------
+UPDATE employees SET salary = salary * 1.1 WHERE department_id = 10;
+
+views
+=====
+- a view is a virtual table that is based on the result of a SELECT query
+- It allows you to encapsulate complex queries and present the result as if it were a table.
+- Views are useful for simplifying queries, enhancing security, and abstracting complex logic.
+
+creating view
+-------------
+CREATE VIEW view_name AS SELECT column1, column2, ... FROM table_name WHERE condition;
+
+example of view - Let's create a simple view that retrieves the names and salaries of employees in the employees
+table whose salaries are greater than a specified amount
+
+CREATE VIEW high_salary_employees AS
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE salary > 50000;
+
+SELECT * FROM high_salary_employees;
+
+updating view
+-------------
+CREATE OR REPLACE VIEW high_salary_employees AS
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE salary > 60000;
+
+dropping the view
+-----------------
+DROP VIEW IF EXISTS view_name;
+
+note : views primary used for querying
+
+stored functions
+----------------
+DELIMITER //
+
+CREATE FUNCTION function_name (parameter1 datatype, parameter2 datatype, ...)
+RETURNS return_datatype
+BEGIN
+    -- SQL statements for the function
+    DECLARE variable1 datatype;
+    -- Additional variables if needed
+
+    -- Function logic
+    SET variable1 = some_expression;
+
+    RETURN variable1;
+END //
+
+DELIMITER ;
+
+example 
+-------
+DELIMITER //
+
+CREATE FUNCTION CalculateTotalSalary(basic_salary DECIMAL(10,2), bonus DECIMAL(5,2))
+RETURNS DECIMAL(10,2)
+BEGIN
+    DECLARE total_salary DECIMAL(10,2);
+    
+    SET total_salary = basic_salary + bonus;
+
+    RETURN total_salary;
+END //
+
+DELIMITER ;
+
+calling the function
+--------------------
+SELECT employee_id, first_name, last_name, CalculateTotalSalary(salary, bonus) AS total_salary
+FROM employees;
+
+dropping the function
+---------------------
+DROP FUNCTION IF EXISTS function_name;
+
+note:
+Stored functions must return a value using the RETURN statement.
+Stored procedures do not return values directly but may use output parameters.
+If you need a routine to perform actions and don't need a direct result, use a stored procedure.
+If you need a routine to return a single value, use a stored function.
+
+Transactions
+------------
+set of sql statements that are executed as a single unit of work.
+it is to ensure consistency and integrity of a database
+
+starting transaction
+start transaction or begin
+
+commiting transaction
+commit
+
+rollback a transaction
+rollback
+
+example
+-------
+START TRANSACTION;
+
+UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;
+
+COMMIT;
+
+savepoints
+----------
+it allows us to set the point within the transaction, to which you can rollback.
+
+START TRANSACTION;
+
+UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;
+
+SAVEPOINT my_savepoint;
+
+UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;
+
+ROLLBACK TO my_savepoint;
+COMMIT;
+
+the changes made after the my_savepoint savepoint are rolled back, but the changes before it remain.
+
+Auto commit
+-----------
+MySQL operates in autocommit mode, where each SQL statement is treated as a separate transaction.
+To disable autocommit and work with explicit transactions, you can use
+SET autocommit = 0;
+
+transaction isolation levels
+----------------------------
+SET TRANSACTION ISOLATION LEVEL isolation_level;
+
+MySQL supports different transaction isolation levels, such as READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE. 
+
+Normalization
+-------------
+it is db design technique
+it is used to oraganize and minimize the data redundancy in a relational db
+
+there are several normal forms
+1-NF
+2-NF
+3-NF
+
+a table is in 1-NF if it meets the following criteria
+all columns contain atomic values
+column should have unique name
+order in which data is stored does not matter
+
+it must be in 1NF
+it should have single column primary key or composite primary key where each atrribute contributes to the key
+
+it must be in 2NF
+no transitive dependency allowed. i.e non prime attribute depends on another non prime attribute
+
+example
+BookID | Title            | Author          | Genre         | Publisher
+-----------------------------------------------------------------------
+1      | Introduction ... | John Smith      | Science       | ABC Publishing
+2      | Data Structures  | Jane Doe        | Computer Sci. | XYZ Books
+3      | Fictional Story  | John Smith      | Fiction       | ABC Publishing
+
+
+AuthorID | Author
+-----------------
+1        | John Smith
+2        | Jane Doe
+
+
+GenreID | Genre
+-----------------
+1       | Science
+2       | Computer Sci.
+3       | Fiction
+
+
+PublisherID | Publisher
+-----------------------
+1           | ABC Publishing
+2           | XYZ Books
+
+BookID | Title             | AuthorID | GenreID | PublisherID
+----------------------------------------------------------------
+1      | Introduction ...  | 1        | 1       | 1
+2      | Data Structures   | 2        | 2       | 2
+3      | Fictional Story   | 1        | 3       | 1
+
+each table has a clear purpose, and the relationships between them are established through foreign key relationships.
+
+foreign key
+it is column or set of column referencing to other table primary or unique key
+it establishes the link b/n two tables
+enforces referential integrity
+these relationships can be one-to-one, one-to-many or many-to-one
+
+example
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(255)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    order_date DATE,
+    customer_id INT,
+    FOREIGN KEY (customer_id)
+    REFERENCES customers(customer_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+actions on delete or update
+---------------------------
+cascade
+same action cascaded to referenced record
+
+set null
+sets null in the referenced record in case of deletion / updation
+
+restrict / no action
+it prevents the deletion and updation of referenced record
+
+union and union all
+-------------------
+union - removes the duplicates
+union all - includes the duplicates
+
+select id, name from employees where joining_year=2023
+union 
+select id, name from employess where joining_year=2024
+
+select id, name from employees where joining_year=2023
+union all
+select id, name from employess where joining_year=2024
+
+group by and having
+-------------------
+these two clause used to filter data based on specified condition
+
+group by 
+it is used to group rows that has same column value
+it is used with aggragate function like - AVG, SUM, COUNT etc
+
+example :
+select customer_id, SUM(total_amt) as total_spent
+from orders
+group by customer_id
+
+having 
+it is to filter result of group by query
+it is similar to where condition
+
+example :
+select customer_id, SUM(total_amt) as total_spent
+from orders
+group by customer_id
+having total_spent>1000
+
+where versus having
+-both are used for filtering the result but key differences are
+where is used with indivisual rows, having is used with groups
+where is used to filter result before grouping
+having is used to filter result after grouping
+
+sub queries
+-----------
+scalar subqueries 
+it returns a single result
+
+select name, salary, (select AVG(salary) from employees) as avg_salary from employees
+
+row subqueries
+returns one or more rows in the result
+select id,name from employee where(department_id,salary) IN (select department_id, MAX(salary) from employees group by department_id)
+
+table subqueries
+returns entire result set
+SELECT * FROM (SELECT employee_id, employee_name FROM employees WHERE department_id = 10) AS dept_10_employees;
+
+usage in select clause
+SELECT employee_name,
+       salary,
+       (SELECT AVG(salary) FROM employees) AS avg_salary
+FROM employees;
+
+usage in where clause
+SELECT employee_name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+usage in where clause
+SELECT department_name, total_salaries
+FROM (SELECT department_id, SUM(salary) AS total_salaries FROM employees GROUP BY department_id) AS dept_totals
+JOIN departments ON dept_totals.department_id = departments.department_id;
+
+usage in having clause
+SELECT department_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id
+HAVING AVG(salary) > (SELECT AVG(salary) FROM employees);
+
+correlated subqueries
+SELECT employee_name, salary
+FROM employees e1
+WHERE salary > (SELECT AVG(salary) FROM employees e2 WHERE e1.department_id = e2.department_id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+create table employees(
+emp_id int primary key auto_increment,
+emp_first_name varchar(120), 
+emp_last_name varchar(120),
+department_name varchar(50),
+project char(2),
+address varchar(100),
+dob DATE,
+gender char(1)
+);
+
+insert into employees(emp_first_name,emp_last_name,department_name ,project,address,dob,gender) values ("Sanjay","Mishra","HR",'P1',"Hyderabad",01/12/1976,'M');
+insert into employees(emp_first_name,emp_last_name,department_name ,project,address,dob,gender) values ("Ananya","Mishra","Admin",'P2',"Delhi",2/05/1968,'F');
+insert into employees(emp_first_name,emp_last_name,department_name ,project,address,dob,gender) values ("Rohan","Diwan","Account",'P3',"Mumbai",01/01/1980,'M');
+insert into employees(emp_first_name,emp_last_name,department_name ,project,address,dob,gender) values ("Sonia","Kulkarni","HR",'P1',"Hyderabad",02/05/1992,'F');
+insert into employees(emp_first_name,emp_last_name,department_name ,project,address,dob,gender) values ("Ankit","Kapoor","Admin",'P2',"Delhi",03/07/1994,'M');
+
+
+create table employee_position(
+emp_id int,
+emp_position varchar(50),
+emp_doj date,
+emp_salary float,
+foreign key (emp_id) references employees(emp_id)
+);
+
+
+insert into employee_position(emp_id,emp_position,emp_doj,emp_salary) values (1,"Manager","2024-05-01",500000);
+insert into employee_position(emp_id,emp_position,emp_doj,emp_salary) values (2,"Executive","2024-05-02",75000);
+insert into employee_position(emp_id,emp_position,emp_doj,emp_salary) values (3,"Manager","2024-05-01",90000);
+insert into employee_position(emp_id,emp_position,emp_doj,emp_salary) values (2,"Lead","2024-05-02",85000);
+insert into employee_position(emp_id,emp_position,emp_doj,emp_salary) values (1,"Executive","2024-05-01",300000);
+
+Write a query to fetch the EmpFname from the EmployeeInfo table in the upper case and use the ALIAS name as EmpName.
+select UPPER(emp_first_name) as EMPNAME from employees;
+
+Write a query to fetch the number of employees working in the department ‘HR’.
+select count(*) from employees where department_name="HR"; OR
+select count(*) from employees group by department_name having department_name="HR";
+
+Write a query to get the current date.
+select now(); OR
+select CURDATE();
+
+Write a query to retrieve the first four characters of  EmpLname from the EmployeeInfo table.
+select substring(emp_last_name, 1,4) from employees;
+
+Write a query to fetch only the place name(string before brackets) from the Address column of EmployeeInfo table.
+select substring(address,1,locate('(',address)-1) from employees;
+
+Write a query to create a new table which consists of data and structure copied from the other table.
+create table temp_employees as select * from employees;
+
+Write q query to find all the employees whose salary is between 50000 to 100000.
+select * from employee_position where emp_salary between 50000 and 100000;
+
+Write a query to find the names of employees that begin with ‘S’?
+select * from employees where emp_first_name like "S%";
+
+Write a query to fetch top N records
+select * from employee_position order by emp_salary desc limit 3;
+
+Write a query to retrieve the EmpFname and EmpLname in a single column as “FullName”. The first name and the last name must be separated with space.
+select concat(emp_first_name , ' ' , emp_last_name) as fullname from employees;
+
+Write a query find number of employees whose DOB is between 02/05/1970 to 31/12/1975 and are grouped according to gender 
+select count(*) , gender from employees where dob between "1970-05-02" and "1995-12-31" group by gender;
+
+Write a query to fetch all the records from the EmployeeInfo table ordered by EmpLname in descending order and Department in the ascending order.
+select * from employees order by emp_last_name desc ,  department_name asc;
+
+Write a query to fetch details of employees whose EmpLname ends with an alphabet ‘A’ and contains six alphabets.
+select * from employees where emp_last_name like '_____a';
+
+Write a query to fetch details of all employees excluding the employees with first names, “Sanjay” and “Sonia” from the EmployeeInfo table.
+select * from employees where emp_first_name not in ('sanjay','sonia');
+
+Write a query to fetch details of employees with the address as “DELHI(DEL)”.
+select * from employees where address like 'Delhi(DEL)%';
+
+
+ 
+
+
+
+
+
